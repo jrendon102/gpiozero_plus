@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+
+<!-- Setup hardware configurations and start up nodes related to hardware components. -->
+<launch>
+    <group ns="hardware">
+        <rosparam command="load" file="$(find expansion_board_driver)/config/hardware.yaml"/>
+    </group>
+    <node name="ybmotors_node" pkg="expansion_board_driver" type="ybmotors.py" output="screen"/>
+</launch>

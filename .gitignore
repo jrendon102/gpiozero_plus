@@ -1,0 +1,11 @@
+# Directories
+devel/ 
+logs/
+build/
+.vscode/
+html/
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
