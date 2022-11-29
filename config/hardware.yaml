@@ -3,3 +3,6 @@
 # MOTORS: [forward_pin, back_pin, pwm_pin]
 left_motor: [20, 21, 16]
 right_motor: [19, 26, 13]
+
+# FAN
+fan_pin: 2

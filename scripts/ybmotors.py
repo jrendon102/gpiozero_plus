@@ -21,8 +21,8 @@ NO_MOTION = MotionType.NO_MOTION.value
 ROTATIONAL = MotionType.ROTATIONAL.value
 
 # Log Messages
-err_rosInit = Message.ROSINIT.value
-err_param = Message.PARAM.value
+ERR_ROSINIT = Message.ROSINIT.value
+ERR_PARAM = Message.PARAM.value
 
 
 class YBMotor:
@@ -33,15 +33,16 @@ class YBMotor:
 
     def __init__(self, curve_scale: float = 0.6) -> None:
         """
-        :param curve_scale: Amount of curvature when moving in a CURVILINEAR motion.
-        Default set to 0.6 which was determined to be acceptable.
+        :param curve_scale:
+            Amount of curvature when moving in a CURVILINEAR motion.
+            Default set to 0.6 which was determined to be acceptable.
         """
         # Set up left & right motors. Pins are set in config file prior to launch.
         try:
             self.left_motor = tuple(rospy.get_param("/hardware/left_motor"))
             self.right_motor = tuple(rospy.get_param("/hardware/right_motor"))
         except KeyError:
-            rospy.logerr(err_param)
+            rospy.logerr(ERR_PARAM)
             sys.exit()
         self.motors = Robot(
             left=self.left_motor, right=self.right_motor, pin_factory=FACTORY
@@ -64,8 +65,8 @@ class YBMotor:
         Callback function that subscribes to specific rostopic. The type of motion that the robot
         moves is determined by the linear and angular velocity values that are received.
 
-        :param vel: ROS message of type Twist.
-        :return: None.
+        :param vel:
+            ROS message of type Twist.
         """
         self.linear = vel.linear.x if abs(vel.linear.x) < 1 else 1
         self.angular = vel.angular.z if abs(vel.angular.z) < 1 else 1
@@ -87,7 +88,6 @@ class YBMotor:
         """
         Communicate with hardware and move robot according to the type of motion that was
         determined.
-        :return: None
         """
         # Robot motion is along a curved path.
         if self.motion_type is CURVILINEAR:
@@ -132,11 +132,11 @@ class YBMotor:
 if __name__ == "__main__":
     try:
         rospy.init_node("ybmotors_node")
-        rospy.loginfo("Starting up motors.")
+        rospy.loginfo("Setting up motors.")
         YBMotor()
         rospy.spin()
     except rospy.ROSInitException:
-        rospy.logerr(err_rosInit)
-    rospy.loginfo("Releasing pins.")
-    FACTORY.close()
-    rospy.loginfo("Motor control terminated.")
+        rospy.logerr(ERR_ROSINIT)
+    rospy.loginfo("Releasing motor pins.")
+    FACTORY.close()  # Release pins.
+    rospy.loginfo("Motors are shutdown.")
