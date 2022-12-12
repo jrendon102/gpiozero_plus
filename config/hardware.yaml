@@ -6,3 +6,9 @@ right_motor: [19, 26, 13]
 
 # FAN
 fan_pin: 2
+
+# LED: [red_pin, green_pin, blue_pin]
+rgb_leds:
+  red: 22
+  green: 27
+  blue: 24

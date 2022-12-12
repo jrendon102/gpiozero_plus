@@ -20,3 +20,10 @@ class MotionType(Enum):
     LINEAR = "LINEAR"
     ROTATIONAL = "ROTATIONAL"
     NO_MOTION = "NO MOTION"
+
+
+class LEDMode(Enum):
+    """This Enum class is useful when referring to LED modes."""
+
+    FLASHLIGHT_MODE = "FLASHLIGHT_MODE"  # Turns on LEDs to full brightness.
+    OFF_MODE = "OFF"

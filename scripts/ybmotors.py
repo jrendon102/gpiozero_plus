@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-This script utilizes the gpiozero library to access the gpio pins on the Raspberry Pi. The purpose
+This script utilizes the gpiozero library to access the GPIO pins on the Raspberry Pi. The purpose
 is to allow communication with motors attached to the Yahboom G1 Tank Expansion Board. The speed
 of the motors are varied to allow maneuverability of the robot in any direction.
 """
