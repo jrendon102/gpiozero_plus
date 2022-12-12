@@ -7,4 +7,5 @@
     </group>
     <node name="ybmotors_node" pkg="expansion_board_driver" type="ybmotors.py"/>
     <node name="ybfan_node" pkg="expansion_board_driver" type="ybfan.py"/>
+    <node name="ybleds_node" pkg="expansion_board_driver" type="ybleds.py"/>
 </launch>
