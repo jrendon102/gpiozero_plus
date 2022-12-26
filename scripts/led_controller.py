@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-This script utilizes the gpiozero library to access the GPIO pins on the Raspberry Pi. The purpose
-is to allow communication with the RGB LED interface on the Yahboom G1 Tank expansion board.
+ROS wrapper node that communicates with the RGB LED interface on the Yahboom G1 Tank.
 """
 import sys
 from threading import Lock
