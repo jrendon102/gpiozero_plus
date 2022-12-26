@@ -43,7 +43,7 @@ class LEDControl:
                 blue_led=rospy.get_param("/hardware/rgb_leds/blue"),
             )
         except KeyError:
-            rospy.logerr(f"[RBG LED]{ERR_PARAM}")
+            rospy.logerr(f"{ERR_PARAM}")
             sys.exit()
 
         # Publisher
