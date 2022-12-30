@@ -15,6 +15,12 @@ catkin_python_setup()
 add_service_files(
   FILES
   fan_mode.srv
+  message_generation
+)
+
+add_message_files(
+  FILES
+  Collision.msg
 )
 
 generate_messages(
@@ -23,5 +29,5 @@ generate_messages(
 )
 
 catkin_package(
-  CATKIN_DEPENDS message_generation rospy std_msgs
+  CATKIN_DEPENDS message_generation rospy std_msgs message_runtime
 )
