@@ -6,7 +6,6 @@ import sys
 from threading import Lock
 
 import rospy
-from std_msgs.msg import Bool
 from geometry_msgs.msg import Twist
 
 from robotEnums import Message, MotionType
@@ -39,13 +38,7 @@ class MotorControl:
             rospy.logerr(ERR_PARAM)
             sys.exit()
 
-        # Publisher
-        self.teleop_pub = rospy.Publisher("/teleop_mode", Bool, queue_size=1)
-
-        # Subscribers
-        self.teleop_vel_sub = rospy.Subscriber(
-            "/teleop_cmd_vel", Twist, self.teleop_vel_callback
-        )
+        # Subscriber
         self.vel_sub = rospy.Subscriber("/cmd_vel", Twist, self.velocity_callback)
 
         # Create lock to prevent race conditions.
@@ -55,26 +48,8 @@ class MotorControl:
         self.linear_x = 0.0
         self.angular_z = 0.0
 
-        # Initialize teleop mode message as False.
-        self.teleop_msg = Bool()
-        self.teleop_msg.data = False
-
         # Rate which determines when to stop motors if no velocity messages have been received.
         self.rate = rospy.Rate(1)
-
-    def teleop_vel_callback(self, vel: Twist) -> None:
-        """
-        Callback function that receives the velocity messages when teleoperting.
-
-        :param `vel`:
-            Velocity which stores the linear and angular velocities in the
-            x, y and z directions.
-        """
-
-        with self.vel_lock:
-            self.linear_x = vel.linear.x if abs(vel.linear.x) < 1 else 1
-            self.angular_z = vel.angular.z if abs(vel.angular.z) < 1 else 1
-            self.teleop_msg.data = True
 
     def velocity_callback(self, vel: Twist) -> None:
         """
@@ -85,12 +60,10 @@ class MotorControl:
             x, y and z directions.
         """
 
-        # If currently in teleop mode we want to skip this. Teleop mode will take precedence.
-        if not self.teleop_msg.data:
-            with self.vel_lock:
-                # Keep the velocities between 0.0 and 1.0.
-                self.linear_x = vel.linear.x if abs(vel.linear.x) < 1 else 1
-                self.angular_z = vel.angular.z if abs(vel.angular.z) < 1 else 1
+        with self.vel_lock:
+            # Keep the velocities between 0.0 and 1.0.
+            self.linear_x = vel.linear.x if abs(vel.linear.x) < 1 else 1
+            self.angular_z = vel.angular.z if abs(vel.angular.z) < 1 else 1
 
     # FIXME: Add a timer to check how long its been since we were in teleop mode without a
     # new message received. If time is exceeded then set teleop mode to false.
@@ -100,10 +73,9 @@ class MotorControl:
         """
         while not rospy.is_shutdown():
             with self.vel_lock:
+                # rospy.loginfo(f"{self.linear_x} {self.angular_z}")
                 self.motors.run(self.linear_x, self.angular_z)
                 self.linear_x = self.angular_z = 0.0
-                self.teleop_pub.publish(self.teleop_msg)
-                self.teleop_msg.data = False
             self.rate.sleep()
 
 
