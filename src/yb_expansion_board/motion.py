@@ -3,7 +3,7 @@
 This script provides functions which describe different types of motion during
 navigation.
 """
-from robotEnums import MotionType
+from yb_expansion_board.robotEnums import MotionType
 
 # Type of motion.
 CURVILINEAR = MotionType.CURVILINEAR.value

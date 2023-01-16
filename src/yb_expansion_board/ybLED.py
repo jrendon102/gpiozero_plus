@@ -6,7 +6,7 @@ is to allow communication with the RGB LED interface on the Yahboom G1 Tank expa
 from gpiozero import RGBLED
 from gpiozero.pins.pigpio import PiGPIOFactory
 
-from robotEnums import LEDMode, Colors
+from yb_expansion_board.robotEnums import LEDMode, Colors
 
 # Modes for different LED settings.
 FLASHLIGHT = LEDMode.FLASHLIGHT_MODE.value
@@ -27,15 +27,15 @@ class YBLED:
     This class allows communication with the RGB LED interface on the Yahboom G1 Tank expansion
     board. It sets up the RGB LED and changes the color and brightness of the LED.
 
-    :param red_led:
+    :param `red_led`:
         The pin # for the red led.
-    :param green_led:
+    :param `green_led`:
         The pin # for the green led.
-    :param blue_led:
+    :param `blue_led`:
         The pin # for the blue led.
     """
 
-    def __init__(self, red_led: int, green_led: int, blue_led: int) -> None:
+    def __init__(self, red_led: list, green_led: list, blue_led: list) -> None:
 
         # Set up pin_factory to get better control of GPIO pin.
         self.factory = PiGPIOFactory()
@@ -49,7 +49,7 @@ class YBLED:
         """
         Adjust the brightness of the LED.
 
-        :param led_color:
+        :param `led_color`:
             The LED color.
 
         returns the LED color with adjusted brightness as a `tuple`.
@@ -63,9 +63,9 @@ class YBLED:
         change the color of the LEDs based what kind of interactions the robot is having with a
         user or environment.
 
-        :param led_mode:
+        :param `led_mode`:
             The mode that determines what colors the LED should be.
-        :param brightness:
+        :param `brightness`:
             Scalar that determines how bright the RGB LED should be.Value should be a number (float)
             between 0 and 1.
         """

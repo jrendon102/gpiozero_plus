@@ -7,8 +7,8 @@ of the motors are varied to allow maneuverability in any direction.
 from gpiozero import Robot
 from gpiozero.pins.pigpio import PiGPIOFactory
 
-from motion import determine_motion
-from robotEnums import MotionType
+from yb_expansion_board.motion import determine_motion
+from yb_expansion_board.robotEnums import MotionType
 
 # Type of motion.
 CURVILINEAR = MotionType.CURVILINEAR.value
@@ -21,21 +21,19 @@ class YBMotor:
     """
     This class allows communication with hardware so that the robot can navigate in any direction.
     Navigation is possible by varying speed of individual motors.
+
+    :param `left_motor`:
+        Pins associated with the left motor.
+    :param `right_motor`:
+        Pins associated with the right motor.
+    :param `curve_scale`:
+        Amount of curvature when moving in a CURVILINEAR motion.
+        `Default` set to 0.6 which was determined to be acceptable.
     """
 
     def __init__(
         self, left_motor: int, right_motor: int, curve_scale: float = 0.6
     ) -> None:
-        """
-        :param `left_motor`:
-            Pins associated with the left motor.
-        :param `right_motor`:
-            Pins associated with the right motor.
-        :param `curve_scale`:
-            Amount of curvature when moving in a CURVILINEAR motion.
-            `Default` set to 0.6 which was determined to be acceptable.
-        """
-
         # Set up pin factory for better control of GPIO pins.
         self.factory = PiGPIOFactory()
         # Set up left & right motors. Pins are set in config file prior to launch.

@@ -8,8 +8,8 @@ from threading import Lock
 import rospy
 from geometry_msgs.msg import Twist
 
-from robotEnums import Message, MotionType
-from ybMotors import YBMotor
+from yb_expansion_board.robotEnums import Message, MotionType
+from yb_expansion_board.ybMotors import YBMotor
 
 # Type of motion.
 CURVILINEAR = MotionType.CURVILINEAR.value

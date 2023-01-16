@@ -8,8 +8,8 @@ from threading import Lock
 import rospy
 from std_msgs.msg import Float32, String
 
-from robotEnums import LEDMode, Message
-from ybLED import YBLED
+from yb_expansion_board.robotEnums import LEDMode, Message
+from yb_expansion_board.ybLED import YBLED
 
 # Log Messages
 ERR_ROSINIT = Message.ROSINIT.value
@@ -75,7 +75,7 @@ class LEDControl:
         Callback function to determine if environmental lighting conditions are too dark or too
         bright.
 
-        :param luminosity_value:
+        :param `luminosity_value`:
             Incoming ROS message which provides luminosity value from camera video feeds.
         """
         with self.led_mode_lock:

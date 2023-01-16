@@ -6,7 +6,7 @@
         <rosparam command="load" file="$(find expansion_board_driver)/config/hardware.yaml"/>
     </group>
     <node name="motor_controller_node" pkg="expansion_board_driver" type="motor_controller.py"/>
-    <node name="ybfan_node"    pkg="expansion_board_driver" type="ybfan.py"/>
+    <node name="ybfan_node"    pkg="expansion_board_driver" type="fan_controller.py"/>
     <node name="led_controller_node"   pkg="expansion_board_driver" type="led_controller.py"/>
 
     <!-- Set up RPLiDAR-->
