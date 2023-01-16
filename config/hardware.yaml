@@ -1,13 +1,28 @@
-# Config file to store important values related to the hardware components.
+###############################################################################
+## Config file to store important values related to the hardware components. ##
+## ------------------------------------------------------------------------  ##
+## Check the official Yahboom G1 Tank expansion board manual for reference   ##
+## to all and any pin numbering. ------------------------------------------  ##
+###############################################################################
 
-# MOTORS: [forward_pin, back_pin, pwm_pin]
+### MOTORS ###
+# <side>_motor: list containing forward, back
+# ------- and pwm values associated with the
+# ------- correct pin numbers.
 left_motor: [20, 21, 16]
 right_motor: [19, 26, 13]
 
-# FAN
-fan_pin: 2
+### FAN ###
+# pin: pin number
+# enabled: initial state of the fan; True(ON)/False(OFF)
+fan:
+  pin: 2
+  enabled: True
 
-# LED: [red_pin, green_pin, blue_pin]
+### LED ###
+# rgb_leds: dictionary containing red, blue
+# --------- green led values associated
+# --------- with the correct pin numbers.
 rgb_leds:
   red: 22
   green: 27
