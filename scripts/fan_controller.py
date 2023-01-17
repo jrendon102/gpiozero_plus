@@ -9,7 +9,7 @@ import rospy
 
 from yb_expansion_board.robotEnums import Message
 from yb_expansion_board.ybFan import YBFan
-from expansion_board_driver.srv import fan_mode, fan_modeResponse
+from expansion_board_driver.srv import enable_fan, enable_fanResponse
 
 # Log Messages
 ERR_ROSINIT = Message.ROSINIT.value
@@ -29,11 +29,11 @@ class FAN:
                 initial_mode=rospy.get_param("/hardware/fan/enabled"),
             )
         except KeyError:
-            rospy.logerr(ERR_PARAM)
+            rospy.logerr(f"{ERR_PARAM}")
             sys.exit()
 
         # Service
-        self.fan_service = rospy.Service("fan_mode", fan_mode, self.fan_callback)
+        self.fan_service = rospy.Service("enable_fan", enable_fan, self.fan_callback)
 
     def fan_callback(self, state):
         """
@@ -48,7 +48,7 @@ class FAN:
             message = "Fan turned ON."
         else:
             self.fan.control_fan(state.enabled)
-        return fan_modeResponse(message)
+        return enable_fanResponse(message)
 
 
 if __name__ == "__main__":

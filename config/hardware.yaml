@@ -6,24 +6,32 @@
 ###############################################################################
 
 ### MOTORS ###
-# <side>_motor: list containing forward, back
-# ------- and pwm values associated with the
-# ------- correct pin numbers.
-left_motor: [20, 21, 16]
-right_motor: [19, 26, 13]
+# motor: dictionary of list containing forward,
+# ------- back and pwm values associated with
+# ------- the correct pin numbers.
+motor:
+  left_rear: [20, 21, 16] # [forward, back, pwm]
+  right_rear: [19, 26, 13] # [forward, back, pwm]
 
 ### FAN ###
-# pin: pin number
-# enabled: initial state of the fan; True(ON)/False(OFF)
+# fan: dictionary containing pin number and
+# ------- whether the fan should be ON/OFF.
 fan:
   pin: 2
-  enabled: True
+  enabled: True # True(ON)/False(OFF)
 
 ### LED ###
-# rgb_leds: dictionary containing red, blue
+# rgb_led: dictionary containing red, blue
 # --------- green led values associated
 # --------- with the correct pin numbers.
-rgb_leds:
+rgb_led:
   red: 22
   green: 27
   blue: 24
+
+### ULTRASONIC ###
+# ultrasonic: dictionary containing echo
+# ----------- and trig pin values.
+ultrasonic:
+  echo: 0 # Connected to SDA
+  trig: 1 # Connected to SDL

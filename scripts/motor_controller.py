@@ -31,8 +31,8 @@ class MotorControl:
         rospy.loginfo("Setting up motors.")
         try:
             self.motors = YBMotor(
-                left_motor=tuple(rospy.get_param("/hardware/left_motor")),
-                right_motor=tuple(rospy.get_param("/hardware/right_motor")),
+                left_motor=tuple(rospy.get_param("/hardware/motor/left_rear")),
+                right_motor=tuple(rospy.get_param("/hardware/motor/right_rear")),
             )
         except KeyError:
             rospy.logerr(ERR_PARAM)
@@ -73,7 +73,6 @@ class MotorControl:
         """
         while not rospy.is_shutdown():
             with self.vel_lock:
-                # rospy.loginfo(f"{self.linear_x} {self.angular_z}")
                 self.motors.run(self.linear_x, self.angular_z)
                 self.linear_x = self.angular_z = 0.0
             self.rate.sleep()
