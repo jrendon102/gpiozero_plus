@@ -37,9 +37,9 @@ class LEDControl:
             # Set up RGB LED
             rospy.loginfo("Setting up RGB LEDs.")
             self.rgb_led = YBLED(
-                red_led=rospy.get_param("/hardware/rgb_leds/red"),
-                green_led=rospy.get_param("/hardware/rgb_leds/green"),
-                blue_led=rospy.get_param("/hardware/rgb_leds/blue"),
+                red_led=rospy.get_param("/hardware/rgb_led/red"),
+                green_led=rospy.get_param("/hardware/rgb_led/green"),
+                blue_led=rospy.get_param("/hardware/rgb_led/blue"),
             )
         except KeyError:
             rospy.logerr(f"{ERR_PARAM}")
@@ -70,7 +70,7 @@ class LEDControl:
         self.log_msg = f"LED MODE:[{self.new_led_mode}]."
 
     # FIXME: Hysteresis is causing robot to have a "disco party".
-    def luminosity_value_callback(self, luminosity_value: Float32):
+    def luminosity_value_callback(self, luminosity_value: Float32) -> None:
         """
         Callback function to determine if environmental lighting conditions are too dark or too
         bright.

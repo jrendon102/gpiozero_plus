@@ -19,7 +19,7 @@ add_message_files(
 
 add_service_files(
   FILES
-  fan_mode.srv
+  enable_fan.srv
 )
 
 generate_messages(
