@@ -1,2 +1,2 @@
-float32 distance
 string collisionType
+float32 distance
