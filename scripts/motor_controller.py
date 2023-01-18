@@ -74,9 +74,10 @@ class MotorControl:
             Information received from ultrasonic sensor.
         """
 
-        distance = data.distance
+        object_distance = data.distance
+        min_distance = data.min_collision_dist
         with self.motor_lock:
-            if distance < 0.09:
+            if object_distance < min_distance:
                 self.collision = True
                 self.linear_x = self.angular_z = 0.0
 
