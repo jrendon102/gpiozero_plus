@@ -34,19 +34,22 @@ class ReverseSafetySensor:
                 echo_pin=rospy.get_param("/hardware/ultrasonic/echo"),
                 trig_pin=rospy.get_param("/hardware/ultrasonic/trig"),
             )
+            self.collision_threshold = rospy.get_param("/hardware/ultrasonic/min_dist")
         except KeyError:
             rospy.logerr(f"{ERR_PARAM}")
             sys.exit()
 
         # Publisher
         self.rear_collision_pub = rospy.Publisher(
-            "/collision_detection", Collision, queue_size=1
+            "/rear_collision",
+            Collision,
+            queue_size=1,
         )
 
         # Subscriber
         self.velocity_sub = rospy.Subscriber("/cmd_vel", Twist, self.velocity_callback)
 
-    def velocity_callback(self, vel) -> None:
+    def velocity_callback(self, vel: Twist) -> None:
         """
         Callback function that receives incoming velocity.
 
@@ -57,8 +60,9 @@ class ReverseSafetySensor:
         if vel.linear.x < 0:
             collision_msg.collisionType = REAR
             collision_msg.distance = self.collision_sensor.get_distance()
+            collision_msg.min_collision_dist = self.collision_threshold
             self.rear_collision_pub.publish(collision_msg)
-            rospy.loginfo(f"Distance:[{collision_msg.distance:.5f}] m")
+            rospy.loginfo(f"Distance:[{collision_msg.distance:.6f}] m")
 
 
 if __name__ == "__main__":

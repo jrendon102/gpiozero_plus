@@ -10,6 +10,7 @@ from geometry_msgs.msg import Twist
 
 from yb_expansion_board.robotEnums import Message, MotionType
 from yb_expansion_board.ybMotors import YBMotor
+from expansion_board_driver.msg import Collision
 
 # Type of motion.
 CURVILINEAR = MotionType.CURVILINEAR.value
@@ -38,18 +39,47 @@ class MotorControl:
             rospy.logerr(ERR_PARAM)
             sys.exit()
 
-        # Subscriber
-        self.vel_sub = rospy.Subscriber("/cmd_vel", Twist, self.velocity_callback)
+        # Subscribers
+        self.rear_collision_sub = rospy.Subscriber(
+            "/rear_collision",
+            Collision,
+            self.rear_collision_callback,
+        )
+        self.vel_sub = rospy.Subscriber(
+            "/cmd_vel",
+            Twist,
+            self.velocity_callback,
+        )
 
         # Create lock to prevent race conditions.
-        self.vel_lock = Lock()
+        self.motor_lock = Lock()
 
         # Initialize linear and angular velocities to 0.0 (m/s)
         self.linear_x = 0.0
         self.angular_z = 0.0
 
-        # Rate which determines when to stop motors if no velocity messages have been received.
-        self.rate = rospy.Rate(1)
+        # Initially, collision is not an issue until we start moving.
+        self.collision = False
+
+        # Rate is set to allow motors to process the recent velocity
+        # changes. (Hz)
+        self.rate = rospy.Rate(15)
+
+    def rear_collision_callback(self, data: Collision) -> None:
+        """
+        Callback function that receives incoming data from ultrasonic
+        sensor.
+
+        :param data:
+            Information received from ultrasonic sensor.
+        """
+
+        object_distance = data.distance
+        min_distance = data.min_collision_dist
+        with self.motor_lock:
+            if object_distance < min_distance:
+                self.collision = True
+                self.linear_x = self.angular_z = 0.0
 
     def velocity_callback(self, vel: Twist) -> None:
         """
@@ -60,21 +90,24 @@ class MotorControl:
             x, y and z directions.
         """
 
-        with self.vel_lock:
-            # Keep the velocities between 0.0 and 1.0.
-            self.linear_x = vel.linear.x if abs(vel.linear.x) < 1 else 1
-            self.angular_z = vel.angular.z if abs(vel.angular.z) < 1 else 1
+        with self.motor_lock:
+            # We need to keep the velocities between 0.0 and 1.0 or the run() function will
+            # crash.
+            if not self.collision:
+                self.linear_x = vel.linear.x if abs(vel.linear.x) < 1 else 1
+                self.angular_z = vel.angular.z if abs(vel.angular.z) < 1 else 1
 
-    # FIXME: Add a timer to check how long its been since we were in teleop mode without a
+    # TODO: Add a timer to check how long its been since we were in teleop mode without a
     # new message received. If time is exceeded then set teleop mode to false.
     def loop(self) -> None:
         """
-        Loop that changes the motor speed. Publishes whether in teleop mode or not.
+        Loop that changes the motor speed.
         """
         while not rospy.is_shutdown():
-            with self.vel_lock:
+            with self.motor_lock:
                 self.motors.run(self.linear_x, self.angular_z)
                 self.linear_x = self.angular_z = 0.0
+                self.collision = False
             self.rate.sleep()
 
 
