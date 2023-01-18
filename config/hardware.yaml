@@ -35,3 +35,4 @@ rgb_led:
 ultrasonic:
   echo: 0 # Connected to SDA
   trig: 1 # Connected to SDL
+  min_dist: 0.08 # Max collision distance
