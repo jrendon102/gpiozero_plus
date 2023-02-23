@@ -1,3 +1,0 @@
-string collisionType
-float32 min_collision_dist
-float32 distance

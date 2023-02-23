@@ -9,7 +9,7 @@ import rospy
 
 from yb_expansion_board.robotEnums import Message
 from yb_expansion_board.ybFan import YBFan
-from expansion_board_driver.srv import enable_fan, enable_fanResponse
+from mach1_msgs.srv import enable_fan, enable_fanResponse
 
 # Log Messages
 ERR_ROSINIT = Message.ROSINIT.value
