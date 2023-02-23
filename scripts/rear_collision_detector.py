@@ -9,7 +9,7 @@ from geometry_msgs.msg import Twist
 
 from yb_expansion_board.robotEnums import Message, CollisionType
 from yb_expansion_board.ybUltraSonic import YBUltrasonic
-from expansion_board_driver.msg import Collision
+from mach1_msgs.msg import Collision
 
 # Log messages
 ERR_ROSINIT = Message.ROSINIT.value
