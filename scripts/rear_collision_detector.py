@@ -31,10 +31,10 @@ class ReverseSafetySensor:
             # Set up Ultrasonic sensor
             rospy.loginfo("Setting up ultrasonic sensor.")
             self.collision_sensor = YBUltrasonic(
-                echo_pin=rospy.get_param("/hardware/ultrasonic/echo"),
-                trig_pin=rospy.get_param("/hardware/ultrasonic/trig"),
+                echo_pin=rospy.get_param("/exp_board/ultrasonic/echo"),
+                trig_pin=rospy.get_param("/exp_board/ultrasonic/trig"),
             )
-            self.collision_threshold = rospy.get_param("/hardware/ultrasonic/min_dist")
+            self.collision_threshold = rospy.get_param("/exp_board/ultrasonic/min_dist")
         except KeyError:
             rospy.logerr(f"{ERR_PARAM}")
             sys.exit()
@@ -47,7 +47,29 @@ class ReverseSafetySensor:
         )
 
         # Subscriber
-        self.velocity_sub = rospy.Subscriber("/cmd_vel", Twist, self.velocity_callback)
+        self.velocity_sub = rospy.Subscriber(
+            "/cmd_vel",
+            Twist,
+            self.velocity_callback,
+        )
+
+        self.velocity_sub = rospy.Subscriber(
+            "/joy_cmd_vel",
+            Twist,
+            self.joystick_vel_callback,
+        )
+
+    def joystick_vel_callback(self, vel: Twist) -> None:
+        """
+        Callback function that receives incoming joystick
+        velocity.
+
+        :param vel:
+            Velocity which stores the linear and angular velocities in the
+            x, y and z directions.
+        """
+        linear_x = vel.linear.x
+        self.run(linear_x)
 
     def velocity_callback(self, vel: Twist) -> None:
         """
@@ -56,8 +78,18 @@ class ReverseSafetySensor:
         :param vel:
             Stores the linear and angular velocities in the x, y and z directions.
         """
+        linear_x = vel.linear.x
+        self.run(linear_x)
+
+    def run(self, velocity: float) -> None:
+        """
+        Determines if there is a possible collision when navigating in reverse.
+
+        :param velocity:
+            Linear velocity in the x.
+        """
         collision_msg = Collision()
-        if vel.linear.x < 0:
+        if velocity < 0:
             collision_msg.collisionType = REAR
             collision_msg.distance = self.collision_sensor.get_distance()
             collision_msg.min_collision_dist = self.collision_threshold
