@@ -3,6 +3,7 @@
 ROS wrapper node that communicates with the Ultrasonic Sensor interface on the Yahboom G1 Tank.
 """
 import sys
+from threading import Lock
 
 import rospy
 from geometry_msgs.msg import Twist
@@ -59,6 +60,8 @@ class ReverseSafetySensor:
             self.joystick_vel_callback,
         )
 
+        self.collision_lock = Lock()
+
     def joystick_vel_callback(self, vel: Twist) -> None:
         """
         Callback function that receives incoming joystick
@@ -68,8 +71,9 @@ class ReverseSafetySensor:
             Velocity which stores the linear and angular velocities in the
             x, y and z directions.
         """
-        linear_x = vel.linear.x
-        self.run(linear_x)
+        with self.collision.lock:
+            linear_x = vel.linear.x
+            self.run(linear_x)
 
     def velocity_callback(self, vel: Twist) -> None:
         """
@@ -78,8 +82,9 @@ class ReverseSafetySensor:
         :param vel:
             Stores the linear and angular velocities in the x, y and z directions.
         """
-        linear_x = vel.linear.x
-        self.run(linear_x)
+        with self.collision_lock:
+            linear_x = vel.linear.x
+            self.run(linear_x)
 
     def run(self, velocity: float) -> None:
         """
@@ -89,12 +94,13 @@ class ReverseSafetySensor:
             Linear velocity in the x.
         """
         collision_msg = Collision()
-        if velocity < 0:
-            collision_msg.collisionType = REAR
-            collision_msg.distance = self.collision_sensor.get_distance()
-            collision_msg.min_collision_dist = self.collision_threshold
-            self.rear_collision_pub.publish(collision_msg)
-            rospy.loginfo(f"Distance:[{collision_msg.distance:.6f}] m")
+        with self.collision_lock:
+            if velocity < 0:
+                collision_msg.collisionType = REAR
+                collision_msg.distance = self.collision_sensor.get_distance()
+                collision_msg.min_collision_dist = self.collision_threshold
+                self.rear_collision_pub.publish(collision_msg)
+                rospy.loginfo(f"Distance:[{collision_msg.distance:.6f}] m")
 
 
 if __name__ == "__main__":

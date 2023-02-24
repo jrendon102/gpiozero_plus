@@ -109,7 +109,7 @@ class MotorControl:
             Velocity which stores the linear and angular velocities in the
             x, y and z directions.
         """
-        # TODO: Add a timer to check how long it has been since we a new message teleop
+        # TODO: Add a timer to check how long it has been since a new message teleop
         # message. If time is exceeded then set teleop to false.
         if not self.collision and not self.joystick_teleop:
             with self.motor_lock:
