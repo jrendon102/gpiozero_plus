@@ -10,7 +10,7 @@ from geometry_msgs.msg import Twist
 
 from yb_expansion_board.robotEnums import Message, MotionType
 from yb_expansion_board.ybMotors import YBMotor
-from expansion_board_driver.msg import Collision
+from mach1_msgs.msg import Collision
 
 # Type of motion.
 CURVILINEAR = MotionType.CURVILINEAR.value
@@ -32,8 +32,8 @@ class MotorControl:
         rospy.loginfo("Setting up motors.")
         try:
             self.motors = YBMotor(
-                left_motor=tuple(rospy.get_param("/hardware/motor/left_rear")),
-                right_motor=tuple(rospy.get_param("/hardware/motor/right_rear")),
+                left_motor=tuple(rospy.get_param("/exp_board/motor/left_rear")),
+                right_motor=tuple(rospy.get_param("/exp_board/motor/right_rear")),
             )
         except KeyError:
             rospy.logerr(ERR_PARAM)
@@ -50,6 +50,14 @@ class MotorControl:
             Twist,
             self.velocity_callback,
         )
+        self.joy_vel_sub = rospy.Subscriber(
+            "joy_cmd_vel",
+            Twist,
+            self.joystick_vel_callback,
+        )
+
+        self.joystick_teleop = None
+        self.collision = False
 
         # Create lock to prevent race conditions.
         self.motor_lock = Lock()
@@ -58,11 +66,7 @@ class MotorControl:
         self.linear_x = 0.0
         self.angular_z = 0.0
 
-        # Initially, collision is not an issue until we start moving.
-        self.collision = False
-
-        # Rate is set to allow motors to process the recent velocity
-        # changes. (Hz)
+        # Sets the rate for incoming messages (Hz)
         self.rate = rospy.Rate(15)
 
     def rear_collision_callback(self, data: Collision) -> None:
@@ -81,6 +85,22 @@ class MotorControl:
                 self.collision = True
                 self.linear_x = self.angular_z = 0.0
 
+    def joystick_vel_callback(self, vel: Twist) -> None:
+        """
+        Callback function that receives incoming joystick
+        velocity.
+
+        :param vel:
+            Velocity which stores the linear and angular velocities in the
+            x, y and z directions.
+        """
+        if not self.collision and self.joystick_teleop is not None:
+            with self.motor_lock:
+                # Keep the velocities between 0.0 and 1.0 to prevent code from crashing.
+                self.linear_x = vel.linear.x if abs(vel.linear.x) < 1 else 1
+                self.angular_z = vel.angular.z if abs(vel.angular.z) < 1 else 1
+                self.joystick_teleop = True
+
     def velocity_callback(self, vel: Twist) -> None:
         """
         Callback function that receives incoming velocity.
@@ -89,16 +109,14 @@ class MotorControl:
             Velocity which stores the linear and angular velocities in the
             x, y and z directions.
         """
-
-        with self.motor_lock:
-            # We need to keep the velocities between 0.0 and 1.0 or the run() function will
-            # crash.
-            if not self.collision:
+        # TODO: Add a timer to check how long it has been since we a new message teleop
+        # message. If time is exceeded then set teleop to false.
+        if not self.collision and not self.joystick_teleop:
+            with self.motor_lock:
+                # Keep the velocities between 0.0 and 1.0 to prevent code from crashing.
                 self.linear_x = vel.linear.x if abs(vel.linear.x) < 1 else 1
                 self.angular_z = vel.angular.z if abs(vel.angular.z) < 1 else 1
 
-    # TODO: Add a timer to check how long its been since we were in teleop mode without a
-    # new message received. If time is exceeded then set teleop mode to false.
     def loop(self) -> None:
         """
         Loop that changes the motor speed.
@@ -107,7 +125,7 @@ class MotorControl:
             with self.motor_lock:
                 self.motors.run(self.linear_x, self.angular_z)
                 self.linear_x = self.angular_z = 0.0
-                self.collision = False
+                self.collision = self.joystick_teleop = False
             self.rate.sleep()
 
 
