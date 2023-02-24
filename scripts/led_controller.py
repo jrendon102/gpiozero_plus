@@ -37,9 +37,9 @@ class LEDControl:
             # Set up RGB LED
             rospy.loginfo("Setting up RGB LEDs.")
             self.rgb_led = YBLED(
-                red_led=rospy.get_param("/hardware/rgb_led/red"),
-                green_led=rospy.get_param("/hardware/rgb_led/green"),
-                blue_led=rospy.get_param("/hardware/rgb_led/blue"),
+                red_led=rospy.get_param("/exp_board/rgb_led/red"),
+                green_led=rospy.get_param("/exp_board/rgb_led/green"),
+                blue_led=rospy.get_param("/exp_board/rgb_led/blue"),
             )
         except KeyError:
             rospy.logerr(f"{ERR_PARAM}")

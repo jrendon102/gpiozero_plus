@@ -25,8 +25,8 @@ class FAN:
         rospy.loginfo("Setting up Fan.")
         try:
             self.fan = YBFan(
-                fan_pin=rospy.get_param("/hardware/fan/pin"),
-                initial_mode=rospy.get_param("/hardware/fan/enabled"),
+                fan_pin=rospy.get_param("/exp_board/fan/pin"),
+                initial_mode=rospy.get_param("/exp_board/fan/enabled"),
             )
         except KeyError:
             rospy.logerr(f"{ERR_PARAM}")
