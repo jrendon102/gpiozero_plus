@@ -51,7 +51,7 @@ class MotorControl:
             self.velocity_callback,
         )
         self.joy_vel_sub = rospy.Subscriber(
-            "joy_cmd_vel",
+            "joy_cmd_vel",  # Originally cmd_vel but remapped.
             Twist,
             self.joystick_vel_callback,
         )

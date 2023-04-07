@@ -71,7 +71,7 @@ class ReverseSafetySensor:
             Velocity which stores the linear and angular velocities in the
             x, y and z directions.
         """
-        with self.collision.lock:
+        with self.collision_lock:
             linear_x = vel.linear.x
             self.run(linear_x)
 
