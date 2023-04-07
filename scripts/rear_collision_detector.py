@@ -48,14 +48,13 @@ class ReverseSafetySensor:
         )
 
         # Subscriber
-        self.velocity_sub = rospy.Subscriber(
+        self.vel_sub = rospy.Subscriber(
             "/cmd_vel",
             Twist,
             self.velocity_callback,
         )
-
-        self.velocity_sub = rospy.Subscriber(
-            "/joy_cmd_vel",
+        self.joy_vel_sub = rospy.Subscriber(
+            "joy_cmd_vel",  # Originally cmd_vel but remapped.
             Twist,
             self.joystick_vel_callback,
         )

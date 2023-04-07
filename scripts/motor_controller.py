@@ -55,11 +55,6 @@ class MotorControl:
             Twist,
             self.joystick_vel_callback,
         )
-        self.keyboard_vel_sub = rospy.Subscriber(
-            "keyboard_cmd_vel",  # Originally cmd_vel but remapped.
-            Twist,
-            self.keyboard_vel_callback,
-        )
 
         self.teleop_mode = None
         self.collision = False
@@ -89,23 +84,6 @@ class MotorControl:
             if object_distance < min_distance:
                 self.collision = True
                 self.linear_x = self.angular_z = 0.0
-
-    def keyboard_vel_callback(self, vel: Twist) -> None:
-        """
-        Callback function that receives incoming keyboard
-        velocity.
-
-        :param vel:
-            Velocity which stores the linear and angular velocities in the
-            x, y and z directions.
-        """
-        # TODO: Prioritize joystick teleop over this keyboard teleop.
-        if not self.collision and self.teleop_mode is not None:
-            with self.motor_lock:
-                # Keep the velocities between 0.0 and 1.0 to prevent code from crashing.
-                self.linear_x = vel.linear.x if abs(vel.linear.x) < 1 else 1
-                self.angular_z = vel.angular.z if abs(vel.angular.z) < 1 else 1
-                self.teleop_mode = True
 
     def joystick_vel_callback(self, vel: Twist) -> None:
         """
