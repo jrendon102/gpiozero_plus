@@ -6,17 +6,14 @@ import sys
 from threading import Lock
 
 import rospy
-from geometry_msgs.msg import Twist
 
+from mach1_msgs.msg import VelStatus
+from yb_expansion_board.navigation import eval_motion
 from yb_expansion_board.robotEnums import Message, MotionType
 from yb_expansion_board.ybMotors import YBMotor
-from mach1_msgs.msg import Collision
 
-# Type of motion.
-CURVILINEAR = MotionType.CURVILINEAR.value
-LINEAR = MotionType.LINEAR.value
+# Initial Motion
 NO_MOTION = MotionType.NO_MOTION.value
-ROTATIONAL = MotionType.ROTATIONAL.value
 
 # Log Messages
 ERR_ROSINIT = Message.ROSINIT.value
@@ -40,92 +37,52 @@ class MotorControl:
             sys.exit()
 
         # Subscribers
-        self.rear_collision_sub = rospy.Subscriber(
-            "/rear_collision",
-            Collision,
-            self.rear_collision_callback,
-        )
         self.vel_sub = rospy.Subscriber(
-            "/cmd_vel",
-            Twist,
+            "/vel_status",
+            VelStatus,
             self.velocity_callback,
         )
-        self.joy_vel_sub = rospy.Subscriber(
-            "joy_cmd_vel",  # Originally cmd_vel but remapped.
-            Twist,
-            self.joystick_vel_callback,
-        )
 
-        self.teleop_mode = None
-        self.collision = False
+        self.linear_x = self.angular_z = 0.0 # (m/s)
+        self.motion_type = NO_MOTION
 
         # Create lock to prevent race conditions.
         self.motor_lock = Lock()
 
-        # Initialize linear and angular velocities to 0.0 (m/s)
-        self.linear_x = 0.0
-        self.angular_z = 0.0
-
         # Sets the rate for incoming messages (Hz)
-        self.rate = rospy.Rate(15)
+        self.rate = rospy.Rate(10)
 
-    def rear_collision_callback(self, data: Collision) -> None:
+    def velocity_callback(self, vel: VelStatus) -> None:
         """
-        Callback function that receives incoming data from ultrasonic
-        sensor.
+        Update the robot's velocity and motion type based on incoming velocity
+        information.
 
-        :param data:
-            Information received from ultrasonic sensor.
+        Parameters:
+            `vel (VelStatus)`: The incoming velocity message.
+
+        Returns:
+            `None`
         """
-
-        object_distance = data.distance
-        min_distance = data.min_collision_dist
         with self.motor_lock:
-            if object_distance < min_distance:
-                self.collision = True
-                self.linear_x = self.angular_z = 0.0
-
-    def joystick_vel_callback(self, vel: Twist) -> None:
-        """
-        Callback function that receives incoming joystick
-        velocity.
-
-        :param vel:
-            Velocity which stores the linear and angular velocities in the
-            x, y and z directions.
-        """
-        if not self.collision and self.teleop_mode is not None:
-            with self.motor_lock:
-                # Keep the velocities between 0.0 and 1.0 to prevent code from crashing.
-                self.linear_x = vel.linear.x if abs(vel.linear.x) < 1 else 1
-                self.angular_z = vel.angular.z if abs(vel.angular.z) < 1 else 1
-                self.teleop_mode = True
-
-    def velocity_callback(self, vel: Twist) -> None:
-        """
-        Callback function that receives incoming velocity.
-
-        :param vel:
-            Velocity which stores the linear and angular velocities in the
-            x, y and z directions.
-        """
-        # TODO: Add a timer to check how long it has been since a new message teleop
-        # message. If time is exceeded then set teleop to false.
-        if not self.collision and not self.teleop_mode:
-            with self.motor_lock:
-                # Keep the velocities between 0.0 and 1.0 to prevent code from crashing.
-                self.linear_x = vel.linear.x if abs(vel.linear.x) < 1 else 1
-                self.angular_z = vel.angular.z if abs(vel.angular.z) < 1 else 1
+            self.linear_x = vel.twist_msg.linear.x
+            self.angular_z = vel.twist_msg.angular.z
+            self.motion_type = eval_motion(self.linear_x, self.angular_z)
 
     def loop(self) -> None:
         """
-        Loop that changes the motor speed.
+        Control the robot's motion in a loop until shutdown.
+
+        Returns:
+            `None`
         """
         while not rospy.is_shutdown():
+            # Set linear and angular velocities to 0.0 to stop motors in case
+            #   vel msg's are no longer being published and last vel msg
+            #   received from callback was non-zero.
             with self.motor_lock:
-                self.motors.run(self.linear_x, self.angular_z)
+                self.motors.run(self.linear_x, self.angular_z, self.motion_type)
                 self.linear_x = self.angular_z = 0.0
-                self.collision = self.teleop_mode = False
+                self.motion_type = NO_MOTION
             self.rate.sleep()
 
 
