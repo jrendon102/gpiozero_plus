@@ -31,6 +31,8 @@ class YBMotor:
         `Default` set to 0.6 which was determined to be acceptable.
     """
 
+    # TODO: M-15:Remove hardcoded curve scale.
+    #       The curve_scale should be set in a config file.
     def __init__(
         self, left_motor: int, right_motor: int, curve_scale: float = 0.6
     ) -> None:
