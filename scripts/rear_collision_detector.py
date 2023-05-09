@@ -6,19 +6,18 @@ import sys
 from threading import Lock
 
 import rospy
-from geometry_msgs.msg import Twist
 
-from yb_expansion_board.robotEnums import Message, CollisionType
 from yb_expansion_board.ybUltraSonic import YBUltrasonic
-from mach1_msgs.msg import Collision
+from yb_expansion_board.robotEnums import Message, CollisionType
+from mach1_msgs.msg import Collision, VelStatus
 
 # Log messages
 ERR_ROSINIT = Message.ROSINIT.value
 ERR_PARAM = Message.PARAM.value
 
-
 # Collision Types
 REAR = CollisionType.REAR_COLLISION.value
+NONE = "NO COLLISION"
 
 
 class ReverseSafetySensor:
@@ -41,71 +40,61 @@ class ReverseSafetySensor:
             sys.exit()
 
         # Publisher
-        self.rear_collision_pub = rospy.Publisher(
-            "/rear_collision",
+        self.sensor_status_pub = rospy.Publisher(
+            "/ultra_sonic_status",
             Collision,
             queue_size=1,
         )
-
         # Subscriber
-        self.vel_sub = rospy.Subscriber(
-            "/cmd_vel",
-            Twist,
-            self.velocity_callback,
-        )
-        self.joy_vel_sub = rospy.Subscriber(
-            "joy_cmd_vel",  # Originally cmd_vel but remapped.
-            Twist,
-            self.joystick_vel_callback,
+        self.vel_status_sub = rospy.Subscriber(
+            "/vel_status",
+            VelStatus,
+            self.vel_status_callback,
         )
 
-        self.collision_lock = Lock()
+        self.sensor_msg = Collision()
+        self.sensor_msg.collisionType = "NONE"
+        self.sensor_msg.min_collision_dist = self.collision_threshold
 
-    def joystick_vel_callback(self, vel: Twist) -> None:
-        """
-        Callback function that receives incoming joystick
-        velocity.
+        # Create lock to prevent race conditions.
+        self.sensor_lock = Lock()
+        # Sets the rate for incoming messages (Hz)
+        self.rate = rospy.Rate(10)
 
-        :param vel:
-            Velocity which stores the linear and angular velocities in the
-            x, y and z directions.
+    def vel_status_callback(self, vel: VelStatus) -> None:
         """
-        with self.collision_lock:
-            linear_x = vel.linear.x
-            self.run(linear_x)
+        Update the robot's velocity and motion type based on incoming velocity
+        information. Determines if there is a possible collision when navigating
+        in reverse.
 
-    def velocity_callback(self, vel: Twist) -> None:
-        """
-        Callback function that receives incoming velocity.
+        Args:
+            `vel (VelStatus)`: The incoming velocity message.
 
-        :param vel:
-            Stores the linear and angular velocities in the x, y and z directions.
+        Returns:
+            `None`
         """
-        with self.collision_lock:
-            linear_x = vel.linear.x
-            self.run(linear_x)
+        with self.sensor_lock:
+            self.sensor_msg.distance = self.collision_sensor.get_distance()
+            if vel.twist_msg.linear.x < 0.0:
+                self.sensor_msg.collisionType = REAR
+                rospy.loginfo(f"Distance:[{self.sensor_msg.distance:.6f}] m")
 
-    def run(self, velocity: float) -> None:
-        """
-        Determines if there is a possible collision when navigating in reverse.
-
-        :param velocity:
-            Linear velocity in the x.
-        """
-        collision_msg = Collision()
-        with self.collision_lock:
-            if velocity < 0:
-                collision_msg.collisionType = REAR
-                collision_msg.distance = self.collision_sensor.get_distance()
-                collision_msg.min_collision_dist = self.collision_threshold
-                self.rear_collision_pub.publish(collision_msg)
-                rospy.loginfo(f"Distance:[{collision_msg.distance:.6f}] m")
+    # TODO: M-8:Collision Warning Response Time
+    def loop(self) -> None:
+        while not rospy.is_shutdown():
+            with self.sensor_lock:
+                self.sensor_msg.distance = self.collision_sensor.get_distance()
+                self.sensor_msg.min_collision_dist = self.collision_threshold
+                self.sensor_status_pub.publish(self.sensor_msg)
+                self.sensor_msg.collisionType = NONE
+            self.rate.sleep()
 
 
 if __name__ == "__main__":
     try:
         rospy.init_node("rear_collision_detector_node")
         detection = ReverseSafetySensor()
+        detection.loop()
         rospy.spin()
         rospy.loginfo("Releasing pins.")
         detection.collision_sensor.disconnect()
