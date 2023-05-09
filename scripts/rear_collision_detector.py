@@ -3,6 +3,7 @@
 ROS wrapper node that communicates with the Ultrasonic Sensor interface on the Yahboom G1 Tank.
 """
 import sys
+from threading import Lock
 
 import rospy
 
@@ -49,7 +50,15 @@ class ReverseSafetySensor:
             VelStatus,
             self.vel_status_callback,
         )
+
         self.sensor_msg = Collision()
+        self.sensor_msg.collisionType = "NONE"
+        self.sensor_msg.min_collision_dist = self.collision_threshold
+
+        # Create lock to prevent race conditions.
+        self.sensor_lock = Lock()
+        # Sets the rate for incoming messages (Hz)
+        self.rate = rospy.Rate(10)
 
     def vel_status_callback(self, vel: VelStatus) -> None:
         """
@@ -63,18 +72,28 @@ class ReverseSafetySensor:
         Returns:
             `None`
         """
-        self.sensor_msg.collisionType = REAR
-        self.sensor_msg.distance = self.collision_sensor.get_distance()
-        self.sensor_msg.min_collision_dist = self.collision_threshold
-        self.sensor_status_pub.publish(self.sensor_msg)
-        if vel.twist_msg.linear.x < 0.0:
-            rospy.loginfo(f"Distance:[{self.sensor_msg.distance:.6f}] m")
+        with self.sensor_lock:
+            self.sensor_msg.distance = self.collision_sensor.get_distance()
+            if vel.twist_msg.linear.x < 0.0:
+                self.sensor_msg.collisionType = REAR
+                rospy.loginfo(f"Distance:[{self.sensor_msg.distance:.6f}] m")
+
+    # TODO: M-8:Collision Warning Response Time
+    def loop(self) -> None:
+        while not rospy.is_shutdown():
+            with self.sensor_lock:
+                self.sensor_msg.distance = self.collision_sensor.get_distance()
+                self.sensor_msg.min_collision_dist = self.collision_threshold
+                self.sensor_status_pub.publish(self.sensor_msg)
+                self.sensor_msg.collisionType = "NONE"
+            self.rate.sleep()
 
 
 if __name__ == "__main__":
     try:
         rospy.init_node("rear_collision_detector_node")
         detection = ReverseSafetySensor()
+        detection.loop()
         rospy.spin()
         rospy.loginfo("Releasing pins.")
         detection.collision_sensor.disconnect()
