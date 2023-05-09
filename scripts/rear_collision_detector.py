@@ -17,6 +17,7 @@ ERR_PARAM = Message.PARAM.value
 
 # Collision Types
 REAR = CollisionType.REAR_COLLISION.value
+NONE = "NO COLLISION"
 
 
 class ReverseSafetySensor:
@@ -85,7 +86,7 @@ class ReverseSafetySensor:
                 self.sensor_msg.distance = self.collision_sensor.get_distance()
                 self.sensor_msg.min_collision_dist = self.collision_threshold
                 self.sensor_status_pub.publish(self.sensor_msg)
-                self.sensor_msg.collisionType = "NONE"
+                self.sensor_msg.collisionType = NONE
             self.rate.sleep()
 
 
