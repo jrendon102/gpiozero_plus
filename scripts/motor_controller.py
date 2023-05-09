@@ -7,10 +7,10 @@ from threading import Lock
 
 import rospy
 
-from mach1_msgs.msg import VelStatus
 from yb_expansion_board.navigation import eval_motion
 from yb_expansion_board.robotEnums import Message, MotionType
 from yb_expansion_board.ybMotors import YBMotor
+from mach1_msgs.msg import Collision, VelStatus
 
 # Initial Motion
 NO_MOTION = MotionType.NO_MOTION.value
@@ -42,8 +42,14 @@ class MotorControl:
             VelStatus,
             self.velocity_callback,
         )
+        self.collision_sub = rospy.Subscriber(
+            "/ultra_sonic_status",
+            Collision,
+            self.collision_callback,
+        )
 
-        self.linear_x = self.angular_z = 0.0 # (m/s)
+        self.collision = False
+        self.linear_x = self.angular_z = 0.0  # (m/s)
         self.motion_type = NO_MOTION
 
         # Create lock to prevent race conditions.
@@ -52,21 +58,39 @@ class MotorControl:
         # Sets the rate for incoming messages (Hz)
         self.rate = rospy.Rate(10)
 
+    def collision_callback(self, sensor_data: Collision) -> None:
+        """
+        Sets the 'collision' attribute to True.
+
+        Args:
+        - `sensor_data (Collision)`: Data received from a sensor.
+
+        Returns:
+        - `None`
+
+        """
+        with self.motor_lock:
+            if sensor_data.distance < sensor_data.min_collision_dist:
+                self.collision = True
+                self.linear_x = self.angular_z = 0
+                self.motion_type = NO_MOTION
+
     def velocity_callback(self, vel: VelStatus) -> None:
         """
         Update the robot's velocity and motion type based on incoming velocity
         information.
 
-        Parameters:
+        Args:
             `vel (VelStatus)`: The incoming velocity message.
 
         Returns:
             `None`
         """
         with self.motor_lock:
-            self.linear_x = vel.twist_msg.linear.x
-            self.angular_z = vel.twist_msg.angular.z
-            self.motion_type = eval_motion(self.linear_x, self.angular_z)
+            if not self.collision:
+                self.linear_x = vel.twist_msg.linear.x
+                self.angular_z = vel.twist_msg.angular.z
+                self.motion_type = eval_motion(self.linear_x, self.angular_z)
 
     def loop(self) -> None:
         """
@@ -83,6 +107,7 @@ class MotorControl:
                 self.motors.run(self.linear_x, self.angular_z, self.motion_type)
                 self.linear_x = self.angular_z = 0.0
                 self.motion_type = NO_MOTION
+                self.collision = False
             self.rate.sleep()
 
 
