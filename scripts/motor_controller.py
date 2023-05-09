@@ -101,7 +101,7 @@ class MotorControl:
         """
         while not rospy.is_shutdown():
             # Set linear and angular velocities to 0.0 to stop motors in case
-            #   vel msg's are no longer being published and last vel msg
+            #   vel msgs are no longer being published and last vel msg
             #   received from callback was non-zero.
             with self.motor_lock:
                 self.motors.run(self.linear_x, self.angular_z, self.motion_type)
