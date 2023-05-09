@@ -74,7 +74,6 @@ class ReverseSafetySensor:
             `None`
         """
         with self.sensor_lock:
-            self.sensor_msg.distance = self.collision_sensor.get_distance()
             if vel.twist_msg.linear.x < 0.0:
                 self.sensor_msg.collisionType = REAR
                 rospy.loginfo(f"Distance:[{self.sensor_msg.distance:.6f}] m")
@@ -84,7 +83,6 @@ class ReverseSafetySensor:
         while not rospy.is_shutdown():
             with self.sensor_lock:
                 self.sensor_msg.distance = self.collision_sensor.get_distance()
-                self.sensor_msg.min_collision_dist = self.collision_threshold
                 self.sensor_status_pub.publish(self.sensor_msg)
                 self.sensor_msg.collisionType = NONE
             self.rate.sleep()
