@@ -8,12 +8,15 @@ from threading import Lock
 import rospy
 
 from yb_expansion_board.navigation import eval_motion
-from yb_expansion_board.robotEnums import Message, MotionType
+from yb_expansion_board.robotEnums import CollisionType, Message, MotionType
 from yb_expansion_board.ybMotors import YBMotor
 from mach1_msgs.msg import Collision, VelStatus
 
 # Initial Motion
 NO_MOTION = MotionType.NO_MOTION.value
+
+# Collision Types
+REAR = CollisionType.REAR_COLLISION.value
 
 # Log Messages
 ERR_ROSINIT = Message.ROSINIT.value
@@ -70,9 +73,12 @@ class MotorControl:
 
         """
         with self.motor_lock:
-            if sensor_data.distance < sensor_data.min_collision_dist:
+            if (
+                sensor_data.collisionType == REAR
+                and sensor_data.distance < sensor_data.min_collision_dist
+            ):
                 self.collision = True
-                self.linear_x = self.angular_z = 0
+                self.linear_x = self.angular_z = 0.0
                 self.motion_type = NO_MOTION
 
     def velocity_callback(self, vel: VelStatus) -> None:
