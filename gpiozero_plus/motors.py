@@ -43,13 +43,17 @@ class MotorController:
         Adjust motor speed based on the provided velocities.
 
         Args:
-            `linear_x` (float): Linear velocity in the x direction.
+            `linear_x (float)`: Linear velocity in the x direction.
 
-            `angular_z` (float): Angular velocity in the z direction.
+            `angular_z (float)`: Angular velocity in the z direction.
 
         Returns:
             None
         """
+
+        # Keep velocity between 0.0 and 1.0
+        linear_x, angular_z = self.constrain_vel_range(linear_x, angular_z)
+
         if linear_x > 0.0 and angular_z > 0.0:
             self.__motors.forward(angular_z, curve_left=self.__curve_scale)
             self.__motion_type = Motion.LEFT_FWD
@@ -85,6 +89,22 @@ class MotorController:
         else:
             self.__motors.stop()
             self.__motion_type = Motion.NO_MOTION
+
+    def constrain_vel_range(self, linear_x: float, angular_z: float) -> "tuple[float, float]":
+        """
+        Constrain the linear and angular velocity values to a range of -1 to 1.
+
+        Args:
+            `linear_x (float)`: The linear velocity value to be constrained.
+            `angular_z (float)`: The angular velocity value to be constrained.
+
+        Returns:
+            `tuple[float, float]`: A tuple containing the constrained linear x and angular z velocity
+            values.
+        """
+        constrained_linear_x = max(min(linear_x, 1.0), -1.0)
+        constrained_angular_z = max(min(angular_z, 1.0), -1.0)
+        return constrained_linear_x, constrained_angular_z
 
     def get_motion_type(self) -> Motion:
         """
