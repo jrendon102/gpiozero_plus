@@ -1,35 +1,35 @@
-# yb_expansion_board
+# gpiozero_plus
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-A Python Library for controlling the Yahboom 4WD expansion board with Raspberry Pi.
+A Python Library providing enhanced features and utilities for gpiozero.
 
-This library provides a Python interface for controlling various functions and components on the Yahboom 4WD expansion board when used with a Raspberry Pi.
+This library is a Python wrapper designed to simplify the setup and control of components using the gpiozero library. It provides a convenient interface for managing various hardware components when working with Raspberry Pi, making it easier to interact with GPIO pins. It is a versatile tool for anyone looking to streamline the control of hardware components in Python applications.
 
 
 ## Dependencies
 
 This library relies on the following dependencies:
 
-- **gpiozero**: A Python library for controlling GPIO pins on Raspberry Pi and other supported platforms. It is used to interface with the hardware components on the Yahboom expansion boards.
+- **gpiozero**: A Python library for controlling GPIO pins on Raspberry Pi and other supported platforms.
 
 - **pigpio**: A library for interfacing with the GPIO pins on the Raspberry Pi. It is required for certain functionality in this library.
 
 
 ## Installation
 
-   You can install the **yb expansion board** library using  `pip`. If you haven't already, make sure you have Python and pip installed on your system.
+   You can install the **gpiozero plus** library using  `pip`. If you haven't already, make sure you have Python and pip installed on your system.
 
-   1. **Clone the Repository**: Clone the **yb expansion board** repository to your local machine.
+   1. **Clone the Repository**: Clone the **gpiozero plus** repository to your local machine.
 
       ```bash
-      git clone https://github.com/jrendon102/yb_expansion_board.git
+      git clone https://github.com/jrendon102/gpiozero_plus.git
       ```
 
    2. **Navigate to the Project Directory**: Go to the directory where you cloned the repository.
       
       ```bash
-      cd yb_expansion_board
+      cd gpiozero_plus
       ```
 
    3. **Install the Package**: Use `pip` to install the package after building it using the provided setup script.
@@ -49,7 +49,7 @@ This library relies on the following dependencies:
       Finally, verify that the package was installed successfully.
       
       ```bash
-      pip list | grep yb_expansion_board
+      pip list | grep gpiozero_plus
       ```
 
 To install **pigpio** library follow these steps:
@@ -64,13 +64,12 @@ To install **pigpio** library follow these steps:
 
       ```bash
       sudo wget https://github.com/joan2937/pigpio/archive/master.zip
-      ``` 
-   
-   3. Unzip the downloaded archive and remove it:
-     
-     ```bash
-     sudo unzip master.zip && sudo rm master.zip
-     ```
+      ```
+   3. Unzip the downloaded archive and remove it
+      
+      ```bash
+      sudo unzip master.zip && sudo rm master.zip
+      ```
 
    4. Change to the pigpio-master direcotry:
 
@@ -85,19 +84,17 @@ To install **pigpio** library follow these steps:
       sudo make install
       ```
 
-After completing these steps, you should have pigpio installed and ready for use with the Yahboom 4WD expansion board.
-
-For more information about pigpio, you can visit the [official website](http://abyz.me.uk/rpi/pigpio/). Information about the pigpio Daemon can be found in the [official website](http://abyz.me.uk/rpi/pigpio/pigpiod.html).
+After completing these steps, you should have pigpio installed and ready for use.
 
 ## Uninstall
-You can uninstall the **yb_expansion_board** using the following command:
+You can uninstall the **gpiozero_plus** using the following command:
 
    ```bash
-   pip uninstall yb_expansion_board
+   pip uninstall gpiozero_plus
    ```
 
 ## Example
-Here's an example of how to use the `yb_expansion_board` library in your Python project:
+Here's an example of how to use the `gpiozero_plus` library in your Python project:
 
 1. Start the pigpio daemon by running the following command:
    
@@ -110,7 +107,7 @@ Here's an example of how to use the `yb_expansion_board` library in your Python 
    ```python
    #!/usr/bin/env python3
    import time
-   from yb_expansion_board.ybFan import YBFan
+   from gpiozero_plus import YBFan
 
    # Initialize and use the various components from the library
    fan = YBFan(fan_pin=2)
@@ -130,12 +127,16 @@ Here's an example of how to use the `yb_expansion_board` library in your Python 
    # operate if 5 seconds have not elapsed.
    except KeyboardInterrupt:
        print("Keyboard interrupt received.")
+   
+   # Make sure to release the GPIO pin(s)
    fan.disconnect()
    ```
 
 3. Finally run the command `python3 my_fan.py` to see the fan in action.
 ## More Information
-For more information about the Yahboom 4WD expansion board, including schematics, user guides and GPIO pin numbering, please visit the [officiall website](http://www.yahboom.net/study/4wd-ban).
+For more information about pigpio, you can visit the [official website](http://abyz.me.uk/rpi/pigpio/). 
+
+Information about the pigpio Daemon can be found in the [official website](http://abyz.me.uk/rpi/pigpio/pigpiod.html).
 
 ## License
 
