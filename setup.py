@@ -1,14 +1,25 @@
 #!/usr/bin/env python3
 
-from setuptools import setup
+from setuptools import setup, find_packages
+
+with open("README.md", "r", encoding="utf-8") as readme_file:
+    long_description = readme_file.read()
 
 setup(
-    name="yb_expansion_board",
-    version="1.0.0",
-    author="Julian A. Rendon",
+    name="gpiozero_plus",
+    version="0.0.1",
+    author="Julian A Rendon",
     author_email="julianrendon514@gmail.com",
-    description="A Python Library for the various Yahboom expansion boards.",
+    description="A Python Library providing enhanced features and utilities for gpiozero.",
+    long_description=long_description,
+    packages=find_packages(),
     license="MIT",
-    packages=["yb_expansion_board"],
     install_requires=["gpiozero"],
+    keywords=["python", "gpiozero", "rpi", "pigpio"],
+    classifiers=[
+        "Development Status :: 2 - Pre-Alpha",
+        "Intended Audience :: Developers",
+        "Programming Language :: Python :: 3",
+        "Operating System :: Unix",
+    ],
 )
