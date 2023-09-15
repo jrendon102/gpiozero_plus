@@ -1,68 +1,90 @@
-# Expansion Board Driver
+# yb_expansion_board
 
-### Overview
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-ROS package that is used to communicate with the [Yahboom G1 Tank](http://www.yahboom.net/study/G1-T-PI) expansion board.
+A Python Library for controlling the Yahboom 4WD expansion board.
 
-### Dependencies
+## Dependencies
 
-1. gpiozero
+This library relies on the following dependency:
 
-   - Download and installation can be found [here](https://gpiozero.readthedocs.io/en/stable/installing.html).
+- **gpiozero**: A Python library for controlling GPIO pins on Raspberry Pi and other supported platforms. It is used to interface with the hardware components on the Yahboom expansion boards.
 
-2. rplidar package
+## Installation
 
-   - You can install rplidar package by running the following command:
-     ```
-     sudo apt install ros-noetic-rplidar-ros
-     ```
-   - Information regarding rplidar package can be found [here](http://wiki.ros.org/rplidar).
+You can install the **yb expansion board** library using  `pip`. If you haven't already, make sure you have Python and pip installed on your system.
 
-3. hector_slam_launch package
-   - You can install hector_slam package by running the following command:
-     ```
-     sudo apt install ros-noetic-hector_slam_launch
-     ```
-   - Information regarding hector_slam_launch package can be found [here](http://wiki.ros.org/hector_slam_launch).
-   - Detailed information regarding hector slam can be found [here](http://wiki.ros.org/hector_slam).
+1. **Clone the Repository**: Clone the **yb expansion board** repository to your local machine.
 
-## Setup
-
-1. Start by creating a ROS workspace and navigate to your src/ directory. Run the following to clone the directory inside your src/ directory.
-
-   ```
-   git clone git@github.com:jrendon102/expansion_board_driver.git
+   ```bash
+   git clone https://github.com/jrendon102/yb_expansion_board.git
    ```
 
-2. Now build and source your workspace.
-
-3. <mark>Important:</mark> Make sure to run the following commands before doing anything. This will launch the pigpio library which is necessary to communicate with the hardware.
-
-   ```
-   sudo pigpiod
+2. **Navigate to the Project Directory**: Go to the directory where you cloned the repository.
+   
+   ```bash
+   cd yb_expansion_board
    ```
 
-   - <mark>NOTE:</mark> If using RPLiDAR A1 make sure to do the following:
+3. **Install the Package**: Use `pip` to install the package after building it using the provided setup script.
 
-     - Check the authority of rplidar's serial-port :
+   First, build the package:
 
-       ```
-       ls -l /dev |grep ttyUSB
-       ```
-
-     - Add the authority of write: (such as /dev/ttyUSB0)
-       ```
-       sudo chmod 666 /dev/ttyUSB0
-       ```
-
-4. Now you are able to start up and communicate with specific hardware by running the following launch file.
-
-   ```
-   roslaunch expansion_board_driver setup_hardware.launch
+   ```bash
+   python3 setup.py sdist
    ```
 
-5. You should now be able to communicate with various hardware attached to the expansion board.
+   Next, use `pip` to install the package from the generated distribution:
+   
+   ```
+   pip install .
+   ```
+   
+   Finally, verify that the package was installed successfully.
+   
+   ```bash
+   pip list | grep yb_expansion_board
+   ```
 
-### Author & Maintainer
+## Uninstall
+You can uninstall the **yb_expansion_board** using the following command:
 
-Julian Rendon (julianrendon514@gmail.com)
+   ```bash
+   pip uninstall yb_expansion_board
+   ```
+
+## Example
+Here's an example of how to use the `yb_expansion_board` library in your Python project:
+
+```python
+import time
+from yb_expansion_board import YBFan 
+
+# Initialize and use the various components from the library
+fan = YBFan(fan_pin=17)
+
+# Turn fan on for 5 seconds
+printf("Turning fan on for 5 seconds")
+fan.control_fan(fan_enable=True)
+time.sleep(5)
+
+# Turn fan on off 5 seconds
+printf("Turning fan off for 5 seconds")
+fan.control_fan(fan_enable=False)
+time.sleep(5)
+
+# Don't forget to disconnect when you're done!
+fan.disconnect()
+```
+
+## More Information
+For more information about the Yahboom 4WD expansion board, including schematics, user guides and GPIO pin numbering, please visit the [officiall website](http://www.yahboom.net/study/4wd-ban).
+
+## License
+
+This project is licensed under the [MIT License](LICENSE) - see the [LICENSE](LICENSE) file for details. 
+
+## Author & Maintainer
+Julian Rendon
+
+Email: julianrendon514@gmail.com
