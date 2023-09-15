@@ -71,10 +71,13 @@ class RGBLEDController:
         """
         Adjusts the brightness of an RGB color.
 
-        Parameter:
+        Args
             `rgb_led`: The RGB color as a tuple (red, green, blue).
 
             `brightness`: The brightness value between 0 (off) and 1 (full brightness).
+
+        Returns:
+            None
         """
         return tuple(value * brightness for value in rgb_led)
 
@@ -82,12 +85,16 @@ class RGBLEDController:
         """
         Changes the color of the RGB LED.
 
-        Parameters:
+        Args:
             `color`: The target RGB color as a tuple (red, green, blue).
 
             `brightness`: The brightness value between 0 (off) and 1 (full brightness).
 
             `raises ValueError`: If the brightness value is outside the valid range [0, 1].
+
+        Returns:
+            None
+
         """
         if 0.0 <= brightness <= 1.0:
             color = self.adjust_brightness(color, brightness)
@@ -99,10 +106,13 @@ class RGBLEDController:
         """
         Cycles through a list of colors at a specified interval.
 
-        Parameters:
+        Args:
             `color_list`: A list of RGB colors to cycle through.
 
             `interval`: The time interval (in seconds) between color changes.
+
+        Returns:
+            None
         """
         for color in color_list:
             self.change_color(color)
@@ -118,12 +128,15 @@ class RGBLEDController:
         """
         Fades the RGB LED smoothly from one color to another over a specified duration.
 
-        Parameters:
+        Args:
             `from_color`: The starting RGB color as a tuple (red, green, blue).
 
             `to_color`: The target RGB color as a tuple (red, green, blue).
 
             `duration`: The duration of the smooth fade effect in seconds.
+
+        Returns:
+            None
         """
         num_steps = 100 * duration
         delay = duration / num_steps
@@ -141,5 +154,8 @@ class RGBLEDController:
     def disconnect(self) -> None:
         """
         Disconnects the RGB LED.
+
+        Returns:
+            None
         """
         self.__rgb_led.close()

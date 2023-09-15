@@ -20,14 +20,14 @@ class Ultrasonic:
     """
     A class for controlling an ultrasonic sensor using gpiozero library.
 
-    Args:
-        echo_pin (int): The GPIO pin connected to the sensor's echo pin.
-        trig_pin (int): The GPIO pin connected to the sensor's trigger pin.
-        max_distance (float): The maximum distance that the sensor can measure.
-        threshold_distance (float): The distance that triggers the "in range" event.
+    Parameters:
+        `echo_pin (int)`: The GPIO pin connected to the sensor's echo pin.
 
-    Attributes:
-        sensor (DistanceSensor): The DistanceSensor instance.
+        `trig_pin (int)`: The GPIO pin connected to the sensor's trigger pin.
+
+        `max_distance (float)`: The maximum distance that the sensor can measure.
+
+        `threshold_distance (float)`: The distance that triggers the "in range" event.
     """
 
     def __init__(
@@ -39,15 +39,6 @@ class Ultrasonic:
     ) -> None:
         """
         Initializes the Ultrasonic instance.
-
-        Parameters:
-            `echo_pin (int)`: The GPIO pin connected to the sensor's echo pin.
-
-            `trig_pin (int)`: The GPIO pin connected to the sensor's trigger pin.
-
-            `max_distance (float)`: The maximum distance that the sensor can measure.
-
-            `threshold_distance (float)`: The distance that triggers the "in range" event.
         """
         self.__factory = PiGPIOFactory()
         self.__sensor = DistanceSensor(
