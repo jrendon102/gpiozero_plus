@@ -8,7 +8,7 @@ and create smooth color transitions.
 
 Author: Julian A Rendon
 Copyright (c) 2023
-License: MIT License (see LICENSE.md)
+License: MIT License
 Last Updated: September 15, 2023
 """
 
@@ -25,15 +25,17 @@ class RGBLEDController:
     """
     A class for controlling an RGB LED using gpiozero library.
 
-    :`param red_pin`: The GPIO pin for the red LED component (default is RED_PIN).
+    Parameters:
+        `red_pin`: The GPIO pin for the red LED component (default is RED_PIN).
 
-    :`param green_pin`: The GPIO pin for the green LED component (default is GREEN_PIN).
+        `green_pin`: The GPIO pin for the green LED component (default is GREEN_PIN).
 
-    :`param blue_pin`: The GPIO pin for the blue LED component (default is BLUE_PIN).
+        `blue_pin`: The GPIO pin for the blue LED component (default is BLUE_PIN).
 
-    :`param initial_color`: The initial RGB color as a tuple (red, green, blue). Default is (0, 0, 0).
+        `initial_color`: The initial RGB color as a tuple (red, green, blue). Default is (0, 0, 0).
 
-    :`param initial_brightness`: The initial brightness value between 0 (off) and 1 (full brightness). Default is 0.0.
+        `initial_brightness`: The initial brightness value between 0 (off) and 1 (full brightness). Default is 0.0.
+
     """
 
     def __init__(
@@ -69,9 +71,10 @@ class RGBLEDController:
         """
         Adjusts the brightness of an RGB color.
 
-        :`param rgb_led`: The RGB color as a tuple (red, green, blue).
+        Parameter:
+            `rgb_led`: The RGB color as a tuple (red, green, blue).
 
-        :`param brightness`: The brightness value between 0 (off) and 1 (full brightness).
+            `brightness`: The brightness value between 0 (off) and 1 (full brightness).
         """
         return tuple(value * brightness for value in rgb_led)
 
@@ -79,11 +82,12 @@ class RGBLEDController:
         """
         Changes the color of the RGB LED.
 
-        :`param color`: The target RGB color as a tuple (red, green, blue).
+        Parameters:
+            `color`: The target RGB color as a tuple (red, green, blue).
 
-        :`param brightness`: The brightness value between 0 (off) and 1 (full brightness).
+            `brightness`: The brightness value between 0 (off) and 1 (full brightness).
 
-        :`raises ValueError`: If the brightness value is outside the valid range [0, 1].
+            `raises ValueError`: If the brightness value is outside the valid range [0, 1].
         """
         if 0.0 <= brightness <= 1.0:
             color = self.adjust_brightness(color, brightness)
@@ -95,9 +99,10 @@ class RGBLEDController:
         """
         Cycles through a list of colors at a specified interval.
 
-        :`param color_list`: A list of RGB colors to cycle through.
+        Parameters:
+            `color_list`: A list of RGB colors to cycle through.
 
-        :`param interval`: The time interval (in seconds) between color changes.
+            `interval`: The time interval (in seconds) between color changes.
         """
         for color in color_list:
             self.change_color(color)
@@ -113,11 +118,12 @@ class RGBLEDController:
         """
         Fades the RGB LED smoothly from one color to another over a specified duration.
 
-        :`param from_color`: The starting RGB color as a tuple (red, green, blue).
+        Parameters:
+            `from_color`: The starting RGB color as a tuple (red, green, blue).
 
-        :`param to_color`: The target RGB color as a tuple (red, green, blue).
+            `to_color`: The target RGB color as a tuple (red, green, blue).
 
-        :`param duration`: The duration of the smooth fade effect in seconds.
+            `duration`: The duration of the smooth fade effect in seconds.
         """
         num_steps = 100 * duration
         delay = duration / num_steps
