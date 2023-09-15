@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-Control an RGB LED on the Yahboom 4WD expansion board using gpiozero library.
+A Python class for controlling an RGB LED using gpiozero library.
 
-This script defines a class, YBRGB, to control the RGB LED on the Yahboom 4WD expansion board.
-You can set the initial color and brightness, change colors, adjust brightness, and toggle the LED 
-state.
+This script defines a class, RGBLEDController, to control an RGB LED using the gpiozero library.
+You can set the initial color and brightness, change colors, adjust brightness, toggle the LED state,
+and create smooth color transitions.
 
 Author: Julian A Rendon
-Copyright (c) 2023 Your 
+Copyright (c) 2023
 License: MIT License (see LICENSE.md)
 Last Updated: September 15, 2023
 """
@@ -17,20 +17,13 @@ import time
 from gpiozero import RGBLED
 from gpiozero.pins.pigpio import PiGPIOFactory
 
-from colors import Colors
-
-# Default GPIO pins for the RGB LED
-RED_PIN = 22
-GREEN_PIN = 27
-BLUE_PIN = 24
-
-DEFAULT_COLOR = Colors.BLACK.value
+DEFAULT_COLOR = (0, 0, 0)
 DEFAULT_BRIGHTNESS = 0.0
 
 
-class YBRGB:
+class RGBLEDController:
     """
-    A class to control an RGB LED on the Yahboom 4WD expansion board.
+    A class for controlling an RGB LED using gpiozero library.
 
     :`param red_pin`: The GPIO pin for the red LED component (default is RED_PIN).
 
@@ -38,23 +31,21 @@ class YBRGB:
 
     :`param blue_pin`: The GPIO pin for the blue LED component (default is BLUE_PIN).
 
-    :`param initial_color`: The initial RGB color as a tuple (red, green, blue).
-    Default is DEFAULT_COLOR.
+    :`param initial_color`: The initial RGB color as a tuple (red, green, blue). Default is (0, 0, 0).
 
-    :`param initial_brightness`: The initial brightness value between 0 (off) and 1 (full brightness).
-    Default is DEFAULT_BRIGHTNESS.
+    :`param initial_brightness`: The initial brightness value between 0 (off) and 1 (full brightness). Default is 0.0.
     """
 
     def __init__(
         self,
-        red_pin: int = RED_PIN,
-        green_pin: int = GREEN_PIN,
-        blue_pin: int = BLUE_PIN,
+        red_pin: int,
+        green_pin: int,
+        blue_pin: int,
         initial_color: tuple = DEFAULT_COLOR,
         initial_brightness: float = DEFAULT_BRIGHTNESS,
     ) -> None:
         """
-        Initializes the YBRGB instance.
+        Initializes the RGBLEDController instance.
         """
         self.__pin_factory = PiGPIOFactory()
         self.__rgb_led = RGBLED(
@@ -68,6 +59,12 @@ class YBRGB:
         else:
             self.__rgb_led.color = initial_color
 
+    def toggle(self):
+        """
+        Toggles the state of the RGB LED.
+        """
+        self.__rgb_led.color = DEFAULT_COLOR
+
     def adjust_brightness(self, rgb_led: tuple, brightness: float) -> None:
         """
         Adjusts the brightness of an RGB color.
@@ -75,8 +72,6 @@ class YBRGB:
         :`param rgb_led`: The RGB color as a tuple (red, green, blue).
 
         :`param brightness`: The brightness value between 0 (off) and 1 (full brightness).
-
-        :`return`: The adjusted RGB color.
         """
         return tuple(value * brightness for value in rgb_led)
 
@@ -95,12 +90,6 @@ class YBRGB:
             self.__rgb_led.color = color
         else:
             raise ValueError("Invalid brightness value")
-
-    def toggle(self):
-        """
-        Toggles the state of the RGB LED.
-        """
-        self.__rgb_led.color = DEFAULT_COLOR
 
     def cycle_colors(self, color_list: list, interval: float) -> None:
         """
@@ -145,6 +134,6 @@ class YBRGB:
 
     def disconnect(self) -> None:
         """
-        Disconnect RGB led.
+        Disconnects the RGB LED.
         """
         self.__rgb_led.close()
