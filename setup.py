@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
-from distutils.core import setup
-from catkin_pkg.python_setup import generate_distutils_setup
 
-d = generate_distutils_setup(
+from setuptools import setup
+
+setup(
+    name="yb_expansion_board",
+    version="1.0.0",
+    author="Julian A. Rendon",
+    author_email="julianrendon514@gmail.com",
+    description="A Python Library for the various Yahboom expansion boards.",
+    license="MIT",
     packages=["yb_expansion_board"],
-    package_dir={"": "src"},
+    install_requires=["gpiozero"],
 )
-
-setup(**d)
