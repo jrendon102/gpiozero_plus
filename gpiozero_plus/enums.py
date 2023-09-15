@@ -1,6 +1,41 @@
 #!/usr/bin/env python3
+"""
+This file contains enumerations for various use cases.
+
+Author: Julian A Rendon
+Copyright (c) 2023
+License: MIT License
+Last Updated: September 19, 2023
+"""
 
 from enum import Enum
+
+
+class Motion(Enum):
+    """
+    An enumeration representing different motion types for a robot.
+
+    Constants:
+        - `STR_FWD` (str): Straight forward motion.
+        - `STR_BK` (str): Straight backward motion.
+        - `LEFT_FWD` (str): Left forward motion.
+        - `RIGHT_FWD` (str): Right forward motion.
+        - `LEFT_BK` (str): Left backward motion.
+        - `RIGHT_BK` (str): Right backward motion.
+        - `ROT_LEFT` (str): Rotational left motion.
+        - `ROT_RIGHT` (str): Rotational right motion.
+        - `NO_MOTION` (str): No motion.
+    """
+
+    STR_FWD = "STRAIGHT_FORWARD"
+    STR_BK = "STRAIGHT_BACKWARD"
+    LEFT_FWD = "LEFT_FORWARD"
+    RIGHT_FWD = "RIGHT_FORWARD"
+    LEFT_BK = "LEFT_BACKWARD"
+    RIGHT_BK = "RIGHT_BACKWARD"
+    ROT_LEFT = "ROTATIONAL_LEFT"
+    ROT_RIGHT = "ROTATIONAL_RIGHT"
+    NO_MOTION = "NO_MOTION"
 
 
 class Colors(Enum):
