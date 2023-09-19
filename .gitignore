@@ -1,11 +1,42 @@
-# Directories
-devel/ 
-logs/
-build/
-.vscode/
-html/
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 
-# Python
-__pycache__
-*.py[cod]
-*$py.class
+# Caches
+.cache/
+.ccls-cache/
+.clangd/
+.vscode/
+
+# Logs and databases
+*.log
+*.sqlite
+*.db
+
+# Temporary files
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# IDE and text editor files
+.idea/
+*.iml
+.vscode/
+*.sublime-workspace
+
+# Environment-specific files
+.env
+
+# Distribution directories
+build/
+dist/
+
+# Python virtual environments
+venv/
+
+# Python .egg-info directories
+*.egg-info/

@@ -1,68 +1,148 @@
-# Expansion Board Driver
+# gpiozero_plus
 
-### Overview
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-ROS package that is used to communicate with the [Yahboom G1 Tank](http://www.yahboom.net/study/G1-T-PI) expansion board.
+A Python Library providing enhanced features and utilities for gpiozero.
 
-### Dependencies
+This library is a Python wrapper designed to simplify the setup and control of components using the gpiozero library. It provides a convenient interface for managing various hardware components when working with Raspberry Pi, making it easier to interact with GPIO pins. It is a versatile tool for anyone looking to streamline the control of hardware components in Python applications.
 
-1. gpiozero
 
-   - Download and installation can be found [here](https://gpiozero.readthedocs.io/en/stable/installing.html).
+## Dependencies
 
-2. rplidar package
+This library relies on the following dependencies:
 
-   - You can install rplidar package by running the following command:
-     ```
-     sudo apt install ros-noetic-rplidar-ros
-     ```
-   - Information regarding rplidar package can be found [here](http://wiki.ros.org/rplidar).
+- **gpiozero**: A Python library for controlling GPIO pins on Raspberry Pi and other supported platforms.
 
-3. hector_slam_launch package
-   - You can install hector_slam package by running the following command:
-     ```
-     sudo apt install ros-noetic-hector_slam_launch
-     ```
-   - Information regarding hector_slam_launch package can be found [here](http://wiki.ros.org/hector_slam_launch).
-   - Detailed information regarding hector slam can be found [here](http://wiki.ros.org/hector_slam).
+- **pigpio**: A library for interfacing with the GPIO pins on the Raspberry Pi. It is required for certain functionality in this library.
 
-## Setup
 
-1. Start by creating a ROS workspace and navigate to your src/ directory. Run the following to clone the directory inside your src/ directory.
+## Installation
 
+   You can install the **gpiozero plus** library using  `pip`. If you haven't already, make sure you have Python and pip installed on your system.
+
+   1. **Clone the Repository**: Clone the **gpiozero plus** repository to your local machine.
+
+      ```bash
+      git clone https://github.com/jrendon102/gpiozero_plus.git
+      ```
+
+   2. **Navigate to the Project Directory**: Go to the directory where you cloned the repository.
+      
+      ```bash
+      cd gpiozero_plus
+      ```
+
+   3. **Install the Package**: Use `pip` to install the package after building it using the provided setup script.
+
+      First, build the package:
+
+      ```bash
+      python3 setup.py sdist
+      ```
+
+      Next, use `pip` to install the package from the generated distribution:
+      
+      ```
+      pip install .
+      ```
+      
+      Finally, verify that the package was installed successfully.
+      
+      ```bash
+      pip list | grep gpiozero_plus
+      ```
+
+To install **pigpio** library follow these steps:
+
+   1. Navigate to `opt/` directory
+      
+      ```bash
+      cd /opt
+      ```
+   
+   2. Download the lastes version of pigpio:
+
+      ```bash
+      sudo wget https://github.com/joan2937/pigpio/archive/master.zip
+      ```
+   3. Unzip the downloaded archive and remove it
+      
+      ```bash
+      sudo unzip master.zip && sudo rm master.zip
+      ```
+
+   4. Change to the pigpio-master direcotry:
+
+      ```bash
+      cd pigpio-master
+      ```
+
+   5. Build and install pigpio:
+   
+      ```bash
+      sudo make
+      sudo make install
+      ```
+
+After completing these steps, you should have pigpio installed and ready for use.
+
+## Uninstall
+You can uninstall the **gpiozero_plus** using the following command:
+
+   ```bash
+   pip uninstall gpiozero_plus
    ```
-   git clone git@github.com:jrendon102/expansion_board_driver.git
-   ```
 
-2. Now build and source your workspace.
+## Example
+Here's an example of how to use the `gpiozero_plus` library in your Python project:
 
-3. <mark>Important:</mark> Make sure to run the following commands before doing anything. This will launch the pigpio library which is necessary to communicate with the hardware.
-
-   ```
+1. Start the pigpio daemon by running the following command:
+   
+   ```bash
    sudo pigpiod
    ```
 
-   - <mark>NOTE:</mark> If using RPLiDAR A1 make sure to do the following:
+2. Create a script called `my_fan.py` with the following code:
+   
+   ```python
+   #!/usr/bin/env python3
+   import time
+   from gpiozero_plus import YBFan
 
-     - Check the authority of rplidar's serial-port :
+   # Initialize and use the various components from the library
+   fan = YBFan(fan_pin=2)
 
-       ```
-       ls -l /dev |grep ttyUSB
-       ```
+   try:
+       # Turn fan on for 5 seconds
+       print("Turning fan on for 5 seconds")
+       fan.control_fan(fan_enable=True)
+       time.sleep(5)
 
-     - Add the authority of write: (such as /dev/ttyUSB0)
-       ```
-       sudo chmod 666 /dev/ttyUSB0
-       ```
+       # Turn fan on off 5 seconds
+       print("Turning fan off for 5 seconds")
+       fan.control_fan(fan_enable=False)
+       time.sleep(5)
 
-4. Now you are able to start up and communicate with specific hardware by running the following launch file.
-
+   # Catch Keyboard interrupt to prevent motor from continuing to
+   # operate if 5 seconds have not elapsed.
+   except KeyboardInterrupt:
+       print("Keyboard interrupt received.")
+   
+   # Make sure to release the GPIO pin(s)
+   fan.disconnect()
    ```
-   roslaunch expansion_board_driver setup_hardware.launch
-   ```
 
-5. You should now be able to communicate with various hardware attached to the expansion board.
+3. Finally run the command `python3 my_fan.py` to see the fan in action.
+## More Information
+For more information about pigpio, you can visit the [official website](http://abyz.me.uk/rpi/pigpio/). 
 
-### Author & Maintainer
+Information about the pigpio Daemon can be found in the [official website](http://abyz.me.uk/rpi/pigpio/pigpiod.html).
 
-Julian Rendon (julianrendon514@gmail.com)
+## License
+
+This project is licensed under the [MIT License](LICENSE) - see the [LICENSE](LICENSE) file for details. 
+
+## Author & Maintainer
+Julian Rendon
+
+Email: julianrendon514@gmail.com
