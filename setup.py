@@ -8,6 +8,7 @@ with open("README.md", "r", encoding="utf-8") as readme_file:
 setup(
     name="gpiozero_plus",
     version="0.0.1",
+    url="https://github.com/jrendon102/gpiozero_plus.git",
     author="Julian A Rendon",
     author_email="julianrendon514@gmail.com",
     description="A Python Library providing enhanced features and utilities for gpiozero.",
