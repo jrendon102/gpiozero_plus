@@ -30,9 +30,7 @@ class Fan:
         Initializes the Fan instance.
         """
         self.__factory = PiGPIOFactory()
-        self.__fan = DigitalOutputDevice(
-            pin=fan_pin, active_high=False, pin_factory=self.__factory
-        )
+        self.__fan = DigitalOutputDevice(pin=fan_pin, active_high=False, pin_factory=self.__factory)
         self.set_fan_state(enabled=initial_enabled)
 
     def set_fan_state(self, enabled: bool) -> None:
@@ -53,4 +51,3 @@ class Fan:
         """
         self.__fan.off()
         self.__factory.close()
-        print(f"An error occurred during cleanup: {str(e)}")
