@@ -19,20 +19,20 @@ from gpiozero_plus.enums import Motion
 
 class MotorController:
     """
-    Controller for motors attached to the Yahboom G1 Tank Expansion Board.
+    Controller for motors using the gpiozero library.
 
     Parameters:
-        `left_motor`:
+        `left_motor (tuple)`:
             Pins associated with the left motor.
 
-        `right_motor`:
+        `right_motor (tuple)`:
             Pins associated with the right motor.
 
         `curve_scale`:
             Amount of curvature when moving in a CURVED motion (default is 0.6).
     """
 
-    def __init__(self, left_motor: int, right_motor: int, curve_scale: float = 0.6) -> None:
+    def __init__(self, left_motor: tuple, right_motor: tuple, curve_scale: float = 0.6) -> None:
         self.__factory = PiGPIOFactory()
         self.__motors = Robot(left=left_motor, right=right_motor, pin_factory=self.__factory)
         self.__curve_scale = curve_scale

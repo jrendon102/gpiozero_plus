@@ -37,7 +37,7 @@ class Fan:
         """
         Sets the state of the fan.
 
-        Parameters:
+        Args:
             `enabled (bool)`: True to turn the fan on, False to turn it off.
         """
         if enabled:
