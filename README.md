@@ -107,10 +107,10 @@ Here's an example of how to use the `gpiozero_plus` library in your Python proje
    ```python
    #!/usr/bin/env python3
    import time
-   from gpiozero_plus import YBFan
+   from gpiozero_plus import Fan
 
    # Initialize and use the various components from the library
-   fan = YBFan(fan_pin=2)
+   fan = Fan(fan_pin=2)
 
    try:
        # Turn fan on for 5 seconds

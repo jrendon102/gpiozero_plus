@@ -59,11 +59,11 @@ class MotorController:
             self.__motion_type = Motion.LEFT_FWD
 
         elif linear_x > 0.0 and angular_z < 0.0:
-            self.__motors.forward(angular_z, curve_right=self.__curve_scale)
+            self.__motors.forward(abs(angular_z), curve_right=self.__curve_scale)
             self.__motion_type = Motion.RIGHT_FWD
 
         elif linear_x < 0.0 and angular_z > 0.0:
-            self.__motors.backward(abs(angular_z), curve_right=self.__curve_scale)
+            self.__motors.backward(angular_z, curve_right=self.__curve_scale)
             self.__motion_type = Motion.RIGHT_BK
 
         elif linear_x < 0.0 and angular_z < 0.0:
